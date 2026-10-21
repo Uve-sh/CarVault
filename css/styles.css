@@ -1,0 +1,1158 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@500;700&family=JetBrains+Mono:wght@500;700&display=swap');
+
+:root {
+  /* Premium Dark Automotive Palette */
+  --bg-deep: #07090E;
+  --bg-surface: #0E131F;
+  --bg-card: rgba(20, 27, 44, 0.72);
+  --bg-card-subtle: rgba(25, 34, 56, 0.45);
+  --border-subtle: rgba(255, 255, 255, 0.08);
+  --border-bright: rgba(255, 255, 255, 0.16);
+
+  --accent-gold: #E5A93C;
+  --accent-blue: #2563EB;
+  --accent-cyan: #06B6D4;
+  --accent-emerald: #10B981;
+  --accent-rose: #F43F5E;
+
+  --text-main: #F8FAFC;
+  --text-muted: #94A3B8;
+  --text-dim: #64748B;
+
+  --radius-xs: 6px;
+  --radius-sm: 10px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+  --radius-xl: 32px;
+  --radius-full: 9999px;
+
+  --shadow-elevated: 0 16px 40px -10px rgba(0, 0, 0, 0.65);
+  --shadow-card: 0 8px 24px -4px rgba(0, 0, 0, 0.4);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background-color: var(--bg-deep);
+  background-image: 
+    radial-gradient(ellipse 90% 50% at 50% -10%, rgba(37, 99, 235, 0.18), transparent 70%),
+    radial-gradient(circle at 100% 100%, rgba(6, 182, 212, 0.08), transparent 50%),
+    linear-gradient(180deg, #07090E 0%, #0B101D 100%);
+  background-attachment: fixed;
+  color: var(--text-main);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  overflow-x: hidden;
+  line-height: 1.45;
+}
+
+/* App Outer Shell (Realistic Phone Viewport on Desktop) */
+.app-container {
+  width: 100%;
+  max-width: 440px;
+  min-height: 100vh;
+  padding: 18px 18px 100px;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+/* ---------------- Top App Bar ---------------- */
+.top-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 22px;
+}
+
+.brand-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.brand-emblem {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #1E293B, #0F172A);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+}
+
+.brand-titles h1 {
+  font-size: 1.05rem;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  color: #fff;
+}
+
+.brand-titles p {
+  font-size: 0.72rem;
+  color: var(--text-dim);
+  font-weight: 500;
+}
+
+.nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.lang-selector {
+  background: rgba(30, 41, 59, 0.6);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-full);
+  padding: 4px 10px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #cbd5e1;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.lang-selector:hover {
+  background: rgba(51, 65, 85, 0.8);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+/* ---------------- HSRP Vehicle Number Plate ---------------- */
+.hsrp-plate {
+  background: #FFFFFF;
+  color: #111827;
+  border-radius: 8px;
+  border: 2px solid #000000;
+  box-shadow: 
+    0 4px 14px rgba(0, 0, 0, 0.4),
+    inset 0 1px 2px rgba(255, 255, 255, 0.8),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.2);
+  display: inline-flex;
+  align-items: center;
+  padding: 0 12px 0 0;
+  position: relative;
+  overflow: hidden;
+  margin: 0 auto 18px;
+  user-select: none;
+}
+
+.hsrp-left-band {
+  background: #003893;
+  color: #FFFFFF;
+  padding: 6px 7px 5px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-right: 12px;
+  border-right: 1.5px solid #000;
+}
+
+.hsrp-chakra {
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  border: 1px solid #7dd3fc;
+  margin-bottom: 2px;
+  background: radial-gradient(circle, #38bdf8 30%, transparent 70%);
+}
+
+.hsrp-ind {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.6rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  line-height: 1;
+}
+
+.hsrp-plate-number {
+  font-family: 'Space Grotesk', 'JetBrains Mono', monospace;
+  font-size: 1.45rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  color: #000000;
+  text-transform: uppercase;
+  text-shadow: 0 0.5px 0 rgba(0,0,0,0.4);
+}
+
+/* ---------------- Screen Management ---------------- */
+.view-screen {
+  display: none;
+  animation: slideFadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  width: 100%;
+}
+
+.view-screen.active {
+  display: flex;
+  flex-direction: column;
+}
+
+@keyframes slideFadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ---------------- Screen 1: Clean PIN Keypad ---------------- */
+.pin-view-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 8px 0;
+}
+
+.vehicle-meta-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(30, 41, 59, 0.5);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-full);
+  padding: 4px 12px;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-bottom: 22px;
+}
+
+.pin-instruction h2 {
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: #FFFFFF;
+  margin-bottom: 6px;
+}
+
+.pin-instruction p {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+/* PIN Dots */
+.pin-indicators {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  margin: 28px 0 20px;
+}
+
+.pin-bubble {
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  border: 1.8px solid rgba(255, 255, 255, 0.25);
+  background: transparent;
+  transition: all 0.18s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.pin-bubble.filled {
+  background: #FFFFFF;
+  border-color: #FFFFFF;
+  box-shadow: 0 0 14px rgba(255, 255, 255, 0.8);
+  transform: scale(1.15);
+}
+
+.pin-bubble.error {
+  background: var(--accent-rose);
+  border-color: var(--accent-rose);
+  box-shadow: 0 0 14px rgba(244, 63, 94, 0.8);
+  animation: shake 0.3s ease-in-out;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-8px); }
+  75% { transform: translateX(8px); }
+}
+
+.pin-status-label {
+  font-size: 0.82rem;
+  min-height: 22px;
+  margin-bottom: 16px;
+  font-weight: 500;
+  color: var(--text-dim);
+}
+
+/* Tactile Mobile Keypad */
+.numpad-container {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  width: 100%;
+  max-width: 310px;
+  margin: 0 auto;
+}
+
+.numpad-key {
+  aspect-ratio: 1;
+  background: rgba(25, 34, 56, 0.6);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-full);
+  color: #FFFFFF;
+  font-size: 1.6rem;
+  font-weight: 600;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.12s ease;
+  user-select: none;
+}
+
+.numpad-key span.sub {
+  font-size: 0.62rem;
+  letter-spacing: 0.15em;
+  color: var(--text-dim);
+  font-weight: 600;
+  margin-top: -3px;
+}
+
+.numpad-key:active {
+  background: rgba(59, 130, 246, 0.3);
+  border-color: rgba(59, 130, 246, 0.5);
+  transform: scale(0.92);
+}
+
+.numpad-key.numpad-action {
+  background: transparent;
+  border-color: transparent;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #93c5fd;
+}
+
+.numpad-key.numpad-action:active {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+/* ---------------- Screen 2: Luxury Automotive Wallet (Active Vault) ---------------- */
+.vehicle-hero-card {
+  background: linear-gradient(135deg, rgba(26, 36, 60, 0.9) 0%, rgba(13, 18, 30, 0.95) 100%);
+  border: 1px solid var(--border-bright);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  box-shadow: var(--shadow-card);
+  margin-bottom: 18px;
+  position: relative;
+  overflow: hidden;
+}
+
+.vehicle-hero-card::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 140px;
+  height: 140px;
+  background: radial-gradient(circle, rgba(37, 99, 235, 0.25) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.hero-top-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 14px;
+}
+
+.vehicle-titles h2 {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: -0.01em;
+}
+
+.vehicle-titles p {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.btn-lock-badge {
+  background: rgba(244, 63, 94, 0.15);
+  border: 1px solid rgba(244, 63, 94, 0.3);
+  color: #fda4af;
+  border-radius: var(--radius-full);
+  padding: 5px 12px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  transition: all 0.2s;
+}
+
+.btn-lock-badge:hover {
+  background: rgba(244, 63, 94, 0.25);
+}
+
+.status-pills-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(16, 185, 129, 0.15);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  color: #34d399;
+  padding: 4px 10px;
+  border-radius: var(--radius-full);
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.status-badge.info {
+  background: rgba(37, 99, 235, 0.15);
+  border-color: rgba(37, 99, 235, 0.3);
+  color: #93c5fd;
+}
+
+/* Consolidated Big "Show Traffic Police" Button */
+.btn-police-pass {
+  width: 100%;
+  background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+  color: #FFFFFF;
+  border: none;
+  border-radius: var(--radius-md);
+  padding: 16px 20px;
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 8px 24px rgba(16, 185, 129, 0.35);
+  cursor: pointer;
+  margin-bottom: 24px;
+  transition: all 0.2s ease;
+}
+
+.btn-police-pass:active {
+  transform: scale(0.98);
+}
+
+.police-pass-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-align: left;
+}
+
+.police-pass-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.police-pass-text div.title {
+  font-size: 0.95rem;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+
+.police-pass-text div.sub {
+  font-size: 0.75rem;
+  opacity: 0.9;
+  font-weight: 500;
+}
+
+/* ---------------- Realistic Smart Document Cards ---------------- */
+.wallet-section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+}
+
+.wallet-section-header h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #FFFFFF;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-add-doc-chip {
+  background: rgba(30, 41, 59, 0.6);
+  border: 1px solid var(--border-bright);
+  color: #93c5fd;
+  border-radius: var(--radius-full);
+  padding: 4px 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.cards-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-bottom: 28px;
+}
+
+/* Smart PVC / Metallic Card Designs */
+.wallet-card {
+  border-radius: var(--radius-md);
+  padding: 16px 18px;
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35);
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 108px;
+}
+
+.wallet-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.45);
+}
+
+.wallet-card:active {
+  transform: scale(0.98);
+}
+
+/* Card Themes */
+.wallet-card.card-rc {
+  background: linear-gradient(135deg, #1E3A8A 0%, #172554 100%);
+  border-left: 4px solid #60A5FA;
+}
+
+.wallet-card.card-insurance {
+  background: linear-gradient(135deg, #065F46 0%, #064E3B 100%);
+  border-left: 4px solid #34D399;
+}
+
+.wallet-card.card-puc {
+  background: linear-gradient(135deg, #0E7490 0%, #164E63 100%);
+  border-left: 4px solid #38BDF8;
+}
+
+.wallet-card.card-license {
+  background: linear-gradient(135deg, #854D0E 0%, #713F12 100%);
+  border-left: 4px solid #FBBF24;
+}
+
+.wallet-card.card-aadhaar {
+  background: linear-gradient(135deg, #374151 0%, #1F2937 100%);
+  border-left: 4px solid #9CA3AF;
+}
+
+.card-top-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.card-meta-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.card-type-tag {
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.card-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #FFFFFF;
+  margin-top: 6px;
+}
+
+.card-bottom-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-top: 14px;
+}
+
+.card-validity {
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.card-validity strong {
+  color: #FFFFFF;
+  font-weight: 700;
+}
+
+.card-status-pill {
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: var(--radius-full);
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(4px);
+  color: #FFFFFF;
+}
+
+/* ---------------- Bottom Sheet Modals (iOS/Android Native Style) ---------------- */
+.sheet-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(8px);
+  z-index: 1000;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.sheet-backdrop.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.sheet-container {
+  background: #0F172A;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 28px 28px 0 0;
+  width: 100%;
+  max-width: 440px;
+  max-height: 88vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.8);
+  transform: translateY(100%);
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.sheet-backdrop.active .sheet-container {
+  transform: translateY(0);
+}
+
+.sheet-handle {
+  width: 44px;
+  height: 5px;
+  background: rgba(255, 255, 255, 0.25);
+  border-radius: var(--radius-full);
+  margin: 12px auto 6px;
+}
+
+.sheet-header {
+  padding: 12px 20px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.sheet-header h3 {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #fff;
+}
+
+.sheet-body {
+  padding: 20px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+/* Consolidated Police Officer Pass Layout */
+.police-pass-screen {
+  text-align: center;
+}
+
+.qr-code-holder {
+  background: #FFFFFF;
+  padding: 16px;
+  border-radius: 16px;
+  display: inline-block;
+  margin: 10px auto 16px;
+  box-shadow: 0 0 35px rgba(255, 255, 255, 0.15);
+}
+
+.verification-checklist {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 18px 0;
+  text-align: left;
+}
+
+.verify-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  background: rgba(30, 41, 59, 0.6);
+  border-radius: var(--radius-sm);
+  font-size: 0.85rem;
+  border-left: 3px solid #10B981;
+}
+
+.verify-item span.status {
+  font-weight: 700;
+  color: #34D399;
+}
+
+/* ---------------- Discreet Prototype Developer Drawer ---------------- */
+.dev-drawer-toggle {
+  position: fixed;
+  bottom: 14px;
+  right: 14px;
+  background: rgba(15, 23, 42, 0.88);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--border-bright);
+  color: var(--text-dim);
+  border-radius: var(--radius-full);
+  padding: 6px 12px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  z-index: 900;
+  transition: all 0.2s;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+}
+
+.dev-drawer-toggle:hover {
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.dev-drawer {
+  position: fixed;
+  bottom: 50px;
+  right: 14px;
+  width: 290px;
+  background: rgba(15, 23, 42, 0.95);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--border-bright);
+  border-radius: var(--radius-md);
+  padding: 14px;
+  box-shadow: var(--shadow-elevated);
+  z-index: 901;
+  display: none;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.dev-drawer.active {
+  display: flex;
+}
+
+.dev-drawer h4 {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  letter-spacing: 0.05em;
+  margin-bottom: 4px;
+}
+
+.dev-drawer button {
+  width: 100%;
+  padding: 8px 10px;
+  font-size: 0.75rem;
+  text-align: left;
+  border-radius: var(--radius-xs);
+  background: rgba(30, 41, 59, 0.7);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+.dev-drawer button:hover {
+  background: rgba(51, 65, 85, 0.9);
+  color: #fff;
+}
+
+/* ---------------- Push Notification Toast ---------------- */
+.sms-toast {
+  position: fixed;
+  top: 18px;
+  left: 50%;
+  transform: translateX(-50%) translateY(-260px);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  width: 90%;
+  max-width: 410px;
+  background: rgba(15, 23, 42, 0.98);
+  backdrop-filter: blur(24px);
+  border: 1px solid rgba(59, 130, 246, 0.4);
+  border-radius: var(--radius-md);
+  padding: 12px 14px;
+  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.8);
+  z-index: 2000;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.25s ease, visibility 0.35s;
+}
+
+.sms-toast.visible {
+  transform: translateX(-50%) translateY(0);
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+.sms-toast-icon {
+  width: 34px;
+  height: 34px;
+  background: #2563EB;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.sms-content {
+  flex: 1;
+}
+
+.sms-content .sms-title {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #93c5fd;
+  text-transform: uppercase;
+}
+
+.sms-content .sms-body {
+  font-size: 0.82rem;
+  color: #fff;
+}
+
+.btn-autofill-otp {
+  background: rgba(59, 130, 246, 0.25);
+  border: 1px solid #3B82F6;
+  color: #93c5fd;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 6px 10px;
+  border-radius: var(--radius-xs);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+/* Generic Form Styles */
+.form-group {
+  margin-bottom: 16px;
+}
+
+.form-group label {
+  display: block;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+}
+
+.form-control {
+  width: 100%;
+  background: rgba(15, 23, 42, 0.8);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  color: #fff;
+  padding: 13px 14px;
+  font-size: 0.95rem;
+  font-family: inherit;
+  transition: border-color 0.2s;
+}
+
+.form-control:focus {
+  outline: none;
+  border-color: var(--accent-blue);
+}
+
+.btn-primary-action {
+  width: 100%;
+  background: linear-gradient(135deg, #2563EB, #1D4ED8);
+  color: #fff;
+  border: none;
+  padding: 14px;
+  border-radius: var(--radius-sm);
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-shadow: 0 4px 18px rgba(37, 99, 235, 0.4);
+}
+
+.btn-secondary-action {
+  width: 100%;
+  background: rgba(30, 41, 59, 0.6);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-muted);
+  padding: 12px;
+  border-radius: var(--radius-sm);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: center;
+  margin-top: 10px;
+}
+
+/* Zero-Knowledge Public Vault Shield (Option B) */
+.zk-vault-shield {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: linear-gradient(135deg, rgba(30, 41, 59, 0.7), rgba(15, 23, 42, 0.85));
+  border: 1px solid rgba(56, 189, 248, 0.25);
+  border-radius: var(--radius-md);
+  padding: 14px 16px;
+  margin-bottom: 20px;
+  box-shadow: 0 8px 24px -6px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.zk-shield-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  background: rgba(37, 99, 235, 0.18);
+  border: 1px solid rgba(96, 165, 250, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.zk-shield-meta {
+  flex: 1;
+  margin-left: 12px;
+  text-align: left;
+}
+
+.zk-shield-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: -0.01em;
+}
+
+.zk-shield-code {
+  font-family: 'Space Grotesk', monospace;
+  font-size: 0.76rem;
+  color: #38bdf8;
+  font-weight: 600;
+  margin-top: 2px;
+}
+
+.zk-live-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 9px;
+  border-radius: var(--radius-full);
+  background: rgba(16, 185, 129, 0.15);
+  border: 1px solid rgba(16, 185, 129, 0.35);
+  color: #34d399;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.zk-live-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: #34d399;
+  box-shadow: 0 0 8px #34d399;
+  animation: pulse-dot 2s infinite;
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.85); }
+}
+
+/* Remember Device Toggle Card */
+.remember-device-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(20, 27, 44, 0.55);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  margin: 14px 0 16px;
+  cursor: pointer;
+  user-select: none;
+  transition: all 0.2s ease;
+}
+
+.remember-device-card:hover {
+  background: rgba(25, 34, 56, 0.75);
+  border-color: rgba(96, 165, 250, 0.3);
+}
+
+.remember-device-card input[type="checkbox"] {
+  display: none;
+}
+
+.remember-device-card .toggle-switch {
+  width: 36px;
+  height: 20px;
+  background: #334155;
+  border-radius: 20px;
+  position: relative;
+  transition: background 0.25s ease;
+  flex-shrink: 0;
+}
+
+.remember-device-card .toggle-switch::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 16px;
+  height: 16px;
+  background: #fff;
+  border-radius: 50%;
+  transition: transform 0.25s ease;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+}
+
+.remember-device-card input[type="checkbox"]:checked + .toggle-switch {
+  background: #2563eb;
+}
+
+.remember-device-card input[type="checkbox"]:checked + .toggle-switch::after {
+  transform: translateX(16px);
+}
+
+.remember-device-card .toggle-text {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+}
+
+.remember-device-card .toggle-text strong {
+  font-size: 0.8rem;
+  color: #f1f5f9;
+  font-weight: 600;
+}
+
+.remember-device-card .toggle-text span {
+  font-size: 0.7rem;
+  color: var(--text-dim);
+}
+
+/* 15-Minute Officer Pass Timer & Sharing */
+.officer-pass-timer-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: linear-gradient(135deg, rgba(37, 99, 235, 0.15), rgba(6, 182, 212, 0.1));
+  border: 1px solid rgba(56, 189, 248, 0.3);
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  margin-bottom: 14px;
+}
+
+.officer-pass-timer-banner .timer-col {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+}
+
+.officer-pass-timer-banner .timer-label {
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: #38bdf8;
+  letter-spacing: 0.05em;
+}
+
+.officer-pass-timer-banner .timer-digits {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #fff;
+}
+
+.badge-active-pulse {
+  background: rgba(16, 185, 129, 0.2);
+  border: 1px solid rgba(16, 185, 129, 0.4);
+  color: #34d399;
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 4px 8px;
+  border-radius: var(--radius-full);
+  letter-spacing: 0.04em;
+}
+
+.share-link-box {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.share-url-input {
+  flex: 1;
+  background: rgba(15, 23, 42, 0.7);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-xs);
+  color: #94a3b8;
+  padding: 8px 10px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+}
+
+.btn-copy-share {
+  background: rgba(37, 99, 235, 0.25);
+  border: 1px solid rgba(96, 165, 250, 0.4);
+  color: #60a5fa;
+  font-size: 0.76rem;
+  font-weight: 700;
+  padding: 8px 12px;
+  border-radius: var(--radius-xs);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+}
+
+.btn-copy-share:hover {
+  background: rgba(37, 99, 235, 0.45);
+  color: #fff;
+}
+

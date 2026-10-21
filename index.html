@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#07090E">
+  <meta name="description" content="NFC Car Vault - Instant digital vehicle documents for owners and fleet operators.">
+  <title>CarVault | Vehicle Document Wallet</title>
+  
+  <base href="/">
+  <link rel="manifest" href="/manifest.json">
+  <link rel="stylesheet" href="/css/styles.css?v=4">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2338bdf8'><path d='M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z'/></svg>">
+  <script>
+    // Ensure all stale Service Worker caches are completely wiped
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.getRegistrations().then(function(regs) {
+        for (var reg of regs) { reg.unregister(); }
+      });
+    }
+    if ('caches' in window) {
+      caches.keys().then(function(names) {
+        for (var name of names) { caches.delete(name); }
+      });
+    }
+  </script>
+</head>
+<body>
+
+  <!-- Push Notification / SMS Simulation Banner -->
+  <div class="sms-toast" id="smsToast">
+    <div class="sms-toast-icon">
+      <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path>
+      </svg>
+    </div>
+    <div class="sms-content">
+      <div class="sms-title" id="smsSender">MESSAGES • CARVAULT</div>
+      <div class="sms-body" id="smsBody">Your OTP code is <strong>741852</strong>.</div>
+    </div>
+    <button class="btn-autofill-otp" id="btnAutoFillOtp">Auto-Fill</button>
+    <button id="btnCloseToast" style="background: transparent; border: none; color: var(--text-dim); font-size: 1.3rem; cursor: pointer; padding: 2px 4px; line-height: 1;">&times;</button>
+  </div>
+
+  <main class="app-container">
+    
+    <!-- Top Navigation Bar -->
+    <header class="top-nav">
+      <div class="brand-wrapper">
+        <div class="brand-emblem">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+          </svg>
+        </div>
+        <div class="brand-titles">
+          <h1>CarVault</h1>
+          <p id="vaultStatusText">Verified Vehicle Wallet</p>
+        </div>
+      </div>
+
+      <div class="nav-actions">
+        <button class="lang-selector" id="btnToggleLang" title="Change Language">
+          <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="2" y1="12" x2="22" y2="12"></line>
+            <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+          </svg>
+          <span id="currentLangLabel">EN</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- SCREEN 1: PIN UNLOCK -->
+    <section class="view-screen active" id="viewPin">
+      <div class="pin-view-card">
+        
+        <!-- Zero-Knowledge Public Gate: NO vehicle or owner details exposed before login -->
+        <div class="zk-vault-shield">
+          <div class="zk-shield-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+            </svg>
+          </div>
+          <div class="zk-shield-meta">
+            <div class="zk-shield-title">CarVault Secure Tag</div>
+            <div class="zk-shield-code" id="lblStickerCodeDisplay">NFC ID: #k8Xq2mPz</div>
+          </div>
+          <div class="zk-live-pill">
+            <span class="zk-live-dot"></span> Protected
+          </div>
+        </div>
+
+        <div class="pin-instruction">
+          <h2 id="txtEnterPin">Enter 6-Digit PIN</h2>
+          <p id="txtPinSub">Decryption keys are unlocked only by your master PIN</p>
+        </div>
+
+        <!-- Visual PIN Bubbles -->
+        <div class="pin-indicators" id="pinDots">
+          <div class="pin-bubble"></div>
+          <div class="pin-bubble"></div>
+          <div class="pin-bubble"></div>
+          <div class="pin-bubble"></div>
+          <div class="pin-bubble"></div>
+          <div class="pin-bubble"></div>
+        </div>
+
+        <div class="pin-status-label" id="attemptsWarning">
+          Default Demo PIN: <strong>123456</strong>
+        </div>
+
+        <!-- Remember Device Toggle (Option B Session Policy) -->
+        <label class="remember-device-card" for="chkRememberDevice">
+          <input type="checkbox" id="chkRememberDevice" checked>
+          <span class="toggle-switch"></span>
+          <div class="toggle-text">
+            <strong>Remember this phone</strong>
+            <span>Keep unlocked on this device for 30 days</span>
+          </div>
+        </label>
+
+        <!-- Tactile Mobile Keypad -->
+        <div class="numpad-container" id="keypadGrid">
+          <button class="numpad-key" data-key="1">1<span class="sub">&nbsp;</span></button>
+          <button class="numpad-key" data-key="2">2<span class="sub">ABC</span></button>
+          <button class="numpad-key" data-key="3">3<span class="sub">DEF</span></button>
+          <button class="numpad-key" data-key="4">4<span class="sub">GHI</span></button>
+          <button class="numpad-key" data-key="5">5<span class="sub">JKL</span></button>
+          <button class="numpad-key" data-key="6">6<span class="sub">MNO</span></button>
+          <button class="numpad-key" data-key="7">7<span class="sub">PQRS</span></button>
+          <button class="numpad-key" data-key="8">8<span class="sub">TUV</span></button>
+          <button class="numpad-key" data-key="9">9<span class="sub">WXYZ</span></button>
+          <button class="numpad-key numpad-action" id="btnForgotPin">Forgot?</button>
+          <button class="numpad-key" data-key="0">0<span class="sub">+</span></button>
+          <button class="numpad-key numpad-action" id="btnKeypadBackspace" title="Delete">
+            <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2M3 12l6.414-6.414a2 2 0 011.414-.586H19a2 2 0 012 2v10a2 2 0 01-2 2h-8.172a2 2 0 01-1.414-.586L3 12z"></path>
+            </svg>
+          </button>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- SCREEN 2: ACTIVE DIGITAL WALLET -->
+    <section class="view-screen" id="viewVault">
+      
+      <!-- Vehicle Hero Card -->
+      <div class="vehicle-hero-card">
+        <div class="hero-top-row">
+          <div class="vehicle-titles">
+            <div class="hsrp-plate" style="margin: 0 0 8px; transform: scale(0.9); transform-origin: left top;">
+              <div class="hsrp-left-band">
+                <div class="hsrp-chakra"></div>
+                <div class="hsrp-ind">IND</div>
+              </div>
+              <div class="hsrp-plate-number" id="vaultPlateBadge">GJ 16 XX 2026</div>
+            </div>
+            <h2 id="vaultVehicleName">Mahindra Bolero Maxi Truck</h2>
+            <p id="vaultOwnerFleet">Noori Transport Co., Bharuch</p>
+          </div>
+          <button class="btn-lock-badge" id="btnLockVaultNow">
+            <svg width="12" height="12" fill="currentColor" viewBox="0 0 24 24">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+              <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+            </svg>
+            <span>Lock</span>
+          </button>
+        </div>
+
+        <div class="status-pills-row">
+          <span class="status-badge">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+            MV Act Rule 139 Compliant
+          </span>
+          <span class="status-badge info">
+            <svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+            5 Documents Active
+          </span>
+        </div>
+      </div>
+
+      <!-- Single Big Action: Show Traffic Police Pass -->
+      <button class="btn-police-pass" id="btnOpenOfficerMode">
+        <div class="police-pass-left">
+          <div class="police-pass-icon">
+            <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+            </svg>
+          </div>
+          <div class="police-pass-text">
+            <div class="title" id="txtPolicePassTitle">Show to Traffic Police</div>
+            <div class="sub" id="txtPolicePassSub">Instant certified QR pass for inspection</div>
+          </div>
+        </div>
+        <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"></path>
+        </svg>
+      </button>
+
+      <!-- Smart Document Stack -->
+      <div class="wallet-section-header">
+        <h3 id="txtDocumentsTitle">
+          <svg width="18" height="18" fill="none" stroke="#60a5fa" stroke-width="2" viewBox="0 0 24 24">
+            <rect x="2" y="4" width="20" height="16" rx="2"></rect>
+            <path d="M7 15h0M2 10h20"></path>
+          </svg>
+          Vehicle Documents
+        </h3>
+        <button class="btn-add-doc-chip" id="btnOpenUploadModal">+ Add File</button>
+      </div>
+
+      <div class="cards-stack" id="documentGrid">
+        <!-- Rendered dynamically as tactile smart wallet cards -->
+      </div>
+
+      <!-- Trust & Privacy Footnote -->
+      <div style="text-align: center; margin-top: 10px; font-size: 0.75rem; color: var(--text-dim);">
+        <span id="btnShowComplianceModal" style="cursor: pointer; text-decoration: underline;">Privacy Policy &amp; Data Deletion Rights</span>
+      </div>
+    </section>
+
+    <!-- SCREEN 3: SECURITY LOCKOUT DISPLAY (Escalating Tiers: 15m, 24h + SMS, Disabled) -->
+    <section class="view-screen" id="viewLockout">
+      <div class="pin-view-card" style="padding-top: 20px;">
+        <div style="width: 68px; height: 68px; background: rgba(244, 63, 94, 0.15); border: 1.5px solid rgba(244, 63, 94, 0.4); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 16px; color: #f43f5e;" id="lockoutIconContainer">
+          <svg width="32" height="32" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+          </svg>
+        </div>
+        <h2 style="font-size: 1.3rem; font-weight: 800; color: #f43f5e; margin-bottom: 6px;" id="lockoutTitle">Sticker Locked</h2>
+        <p style="font-size: 0.85rem; color: var(--text-muted); max-width: 290px;" id="lockoutSubText">
+          Failed PIN attempts detected. Hardware tag access temporarily frozen.
+        </p>
+
+        <div style="font-family: 'JetBrains Mono', monospace; font-size: 2.2rem; font-weight: 700; color: #f43f5e; margin: 18px 0;" id="lockoutTimerDisplay">
+          15:00
+        </div>
+
+        <div class="lockout-alert-pill" id="lockoutSmsNotice" style="display: none; background: rgba(245, 158, 11, 0.15); border: 1px solid rgba(245, 158, 11, 0.35); border-radius: 10px; padding: 10px 14px; font-size: 0.78rem; color: #fbbf24; margin-bottom: 16px; text-align: left;">
+          📲 <strong>Security Alert Sent:</strong> An SMS notification was dispatched to the vehicle owner regarding suspicious activity.
+        </div>
+
+        <button class="btn-primary-action" id="btnUnlockWithOtpFromLockout" style="background: linear-gradient(135deg, #e11d48, #be123c);">
+          Reset via Owner's Phone OTP
+        </button>
+
+        <button class="btn-secondary-action" id="btnBypassLockout" style="margin-top: 12px;">
+          ⚡ Clear Lockout (Demo Shortcut)
+        </button>
+      </div>
+    </section>
+
+    <!-- SCREEN 4: FORGOT PIN RECOVERY -->
+    <section class="view-screen" id="viewRecovery">
+      <div style="padding: 10px 0;">
+        <div style="text-align: center; margin-bottom: 22px;">
+          <h2 style="font-size: 1.3rem; font-weight: 800; margin-bottom: 6px;">Reset Your PIN</h2>
+          <p style="font-size: 0.85rem; color: var(--text-muted);">
+            An OTP will be sent to your registered number. Your documents will remain safe.
+          </p>
+        </div>
+
+        <div class="form-group">
+          <label>Registered Phone Number</label>
+          <input type="text" id="recoveryMaskedPhone" class="form-control" value="+91 98795 •••••" readonly style="opacity: 0.8;">
+        </div>
+
+        <button type="button" class="btn-primary-action" id="btnSendRecoveryOtp">
+          Send Recovery OTP
+        </button>
+
+        <div id="recoveryOtpSection" style="display: none; margin-top: 20px;">
+          <div class="form-group">
+            <label for="recoveryOtpInput">Enter 6-Digit OTP</label>
+            <input type="number" id="recoveryOtpInput" class="form-control" placeholder="6-digit code" maxlength="6" style="text-align: center; letter-spacing: 0.25em; font-size: 1.25rem;">
+          </div>
+
+          <div class="form-group">
+            <label for="recoveryNewPin">New 6-Digit PIN</label>
+            <input type="password" id="recoveryNewPin" class="form-control" placeholder="••••••" maxlength="6" inputmode="numeric" style="text-align: center; letter-spacing: 0.3em; font-size: 1.25rem;">
+          </div>
+
+          <div class="form-group">
+            <label for="recoveryNewPinConfirm">Confirm New PIN</label>
+            <input type="password" id="recoveryNewPinConfirm" class="form-control" placeholder="••••••" maxlength="6" inputmode="numeric" style="text-align: center; letter-spacing: 0.3em; font-size: 1.25rem;">
+          </div>
+
+          <button type="button" class="btn-primary-action" id="btnExecutePinReset">
+            Save New PIN &amp; Open Vault
+          </button>
+        </div>
+
+        <button type="button" class="btn-secondary-action" id="btnCancelRecovery" style="margin-top: 14px;">Back</button>
+      </div>
+    </section>
+
+    <!-- SCREEN 5: NEW STICKER ACTIVATION -->
+    <section class="view-screen" id="viewUnclaimed">
+      <div style="padding: 10px 0;">
+        <div style="text-align: center; margin-bottom: 22px;">
+          <div style="width: 58px; height: 58px; background: rgba(37, 99, 235, 0.15); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 12px; color: #60a5fa;">
+            <svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+            </svg>
+          </div>
+          <h2 style="font-size: 1.3rem; font-weight: 800;">Activate Car Sticker</h2>
+          <p style="font-size: 0.85rem; color: var(--text-muted);">
+            Link your vehicle to this NFC tag and secure it with your private PIN.
+          </p>
+        </div>
+
+        <div id="claimStep1">
+          <div class="form-group">
+            <label for="claimScratchCode">Secret Claim Code (Under Scratch Foil)</label>
+            <input type="text" id="claimScratchCode" class="form-control" placeholder="e.g. CV-8924-X" value="CV-8924-X" required style="text-transform: uppercase; font-family: 'Space Grotesk', monospace; font-size: 1.1rem; letter-spacing: 0.1em; color: #38bdf8;">
+            <small style="display:block; margin-top: 4px; color: var(--text-muted); font-size: 0.74rem;">
+              🏷️ Found inside sticker packaging. Proves you physically own this tag.
+            </small>
+          </div>
+
+          <div class="form-group">
+            <label for="claimVehicleNumber">Vehicle Number</label>
+            <input type="text" id="claimVehicleNumber" class="form-control" placeholder="e.g. GJ 16 AB 1234" required style="text-transform: uppercase; font-family: 'Space Grotesk', monospace; font-size: 1.1rem; letter-spacing: 0.05em;">
+          </div>
+
+          <div class="form-group">
+            <label for="claimVehicleName">Vehicle Name / Fleet Tag</label>
+            <input type="text" id="claimVehicleName" class="form-control" placeholder="e.g. Mahindra Bolero / Tata Ace" required>
+          </div>
+
+          <div class="form-group">
+            <label for="claimPhone">Owner Mobile Number (For Recovery)</label>
+            <input type="tel" id="claimPhone" class="form-control" value="8866831535" placeholder="8866831535" maxlength="10" required>
+            <small style="display:block; margin-top: 5px; color: #60a5fa; font-size: 0.78rem;">
+              ℹ️ Twilio Free Trial delivers real SMS to your verified phone: <strong>+91 8866831535</strong>
+            </small>
+          </div>
+
+          <button type="button" class="btn-primary-action" id="btnSendClaimOtp">
+            Send Verification OTP
+          </button>
+        </div>
+
+        <div id="claimStep2" style="display: none;">
+          <div class="form-group">
+            <label for="claimOtpInput">Enter 6-Digit OTP</label>
+            <input type="number" id="claimOtpInput" class="form-control" placeholder="6-digit code" maxlength="6" style="text-align: center; letter-spacing: 0.25em; font-size: 1.25rem;">
+          </div>
+
+          <div class="form-group">
+            <label for="claimPin">Create 6-Digit PIN</label>
+            <input type="password" id="claimPin" class="form-control" placeholder="••••••" maxlength="6" inputmode="numeric" style="text-align: center; letter-spacing: 0.3em; font-size: 1.25rem;">
+          </div>
+
+          <div class="form-group">
+            <label for="claimPinConfirm">Confirm 6-Digit PIN</label>
+            <input type="password" id="claimPinConfirm" class="form-control" placeholder="••••••" maxlength="6" inputmode="numeric" style="text-align: center; letter-spacing: 0.3em; font-size: 1.25rem;">
+          </div>
+
+          <button type="button" class="btn-primary-action" id="btnFinalizeClaim">
+            Activate &amp; Lock Sticker
+          </button>
+          <button type="button" class="btn-secondary-action" id="btnBackToClaimStep1">Back</button>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- BOTTOM SHEET: POLICE INSPECTION PASS -->
+  <div class="sheet-backdrop" id="modalOfficerMode">
+    <div class="sheet-container">
+      <div class="sheet-handle"></div>
+      <div class="sheet-header">
+        <h3>Traffic Police Digital Pass</h3>
+        <button class="btn-close-modal" id="btnCloseOfficerModal" style="background: transparent; border: none; color: #94a3b8; font-size: 1.5rem; cursor: pointer;">&times;</button>
+      </div>
+      <div class="sheet-body police-pass-screen">
+        <div class="hsrp-plate" style="margin-bottom: 12px;">
+          <div class="hsrp-left-band">
+            <div class="hsrp-chakra"></div>
+            <div class="hsrp-ind">IND</div>
+          </div>
+          <div class="hsrp-plate-number" id="officerModalPlate">GJ 16 XX 2026</div>
+        </div>
+
+        <!-- QR Code -->
+        <div class="qr-code-holder">
+          <svg width="170" height="170" viewBox="0 0 100 100" fill="#000">
+            <rect x="6" y="6" width="26" height="26" rx="4" fill="#000" />
+            <rect x="11" y="11" width="16" height="16" fill="#fff" />
+            <rect x="14" y="14" width="10" height="10" fill="#000" />
+            
+            <rect x="68" y="6" width="26" height="26" rx="4" fill="#000" />
+            <rect x="73" y="11" width="16" height="16" fill="#fff" />
+            <rect x="76" y="14" width="10" height="10" fill="#000" />
+
+            <rect x="6" y="68" width="26" height="26" rx="4" fill="#000" />
+            <rect x="11" y="73" width="16" height="16" fill="#fff" />
+            <rect x="14" y="76" width="10" height="10" fill="#000" />
+
+            <rect x="36" y="12" width="6" height="6" />
+            <rect x="46" y="12" width="6" height="6" />
+            <rect x="56" y="12" width="6" height="6" />
+            <rect x="36" y="26" width="6" height="6" />
+            <rect x="46" y="36" width="6" height="6" />
+            <rect x="56" y="46" width="6" height="6" />
+            <rect x="26" y="46" width="6" height="6" />
+            <rect x="16" y="56" width="6" height="6" />
+            <rect x="68" y="42" width="6" height="6" />
+            <rect x="78" y="52" width="6" height="6" />
+            <rect x="68" y="62" width="6" height="6" />
+            <rect x="42" y="68" width="6" height="6" />
+            <rect x="52" y="78" width="6" height="6" />
+            <rect x="62" y="68" width="6" height="6" />
+            <rect x="78" y="78" width="6" height="6" />
+          </svg>
+        </div>
+
+        <!-- 15-Minute View-Only Officer Pass -->
+        <div class="officer-pass-timer-banner">
+          <div class="timer-col">
+            <span class="timer-label">PASS AUTO-EXPIRES IN:</span>
+            <span class="timer-digits" id="officerPassCountdown">14:59</span>
+          </div>
+          <span class="badge-active-pulse">● LIVE PASS</span>
+        </div>
+
+        <!-- Share URL Bar for Officer Phone -->
+        <div class="share-link-box">
+          <input type="text" id="officerShareUrlInput" class="share-url-input" value="https://carvault.in/p/v8Xm49q2" readonly>
+          <button type="button" class="btn-copy-share" id="btnCopyOfficerLink">Copy Link</button>
+        </div>
+
+        <div class="verification-checklist">
+          <div class="verify-item">
+            <span>Vehicle Registration (RC)</span>
+            <span class="status">✓ Valid</span>
+          </div>
+          <div class="verify-item">
+            <span>Commercial Insurance Policy</span>
+            <span class="status">✓ Active</span>
+          </div>
+          <div class="verify-item">
+            <span>Pollution Under Control (PUC)</span>
+            <span class="status">✓ Certified</span>
+          </div>
+          <div class="verify-item">
+            <span>Commercial Driving License</span>
+            <span class="status">✓ Valid</span>
+          </div>
+        </div>
+
+        <div style="display: flex; gap: 10px; margin-top: 14px;">
+          <button class="btn-primary-action" id="btnDoneOfficerMode" style="flex: 1;">Close Pass</button>
+          <button class="btn-secondary-action" id="btnRevokeOfficerPass" style="margin-top: 0; background: rgba(244, 63, 94, 0.15); color: #fda4af; border-color: rgba(244, 63, 94, 0.3);">Revoke Now</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BOTTOM SHEET: DOCUMENT VIEWER -->
+  <div class="sheet-backdrop" id="modalDocPreview">
+    <div class="sheet-container">
+      <div class="sheet-handle"></div>
+      <div class="sheet-header">
+        <h3 id="previewDocTitle">Document Details</h3>
+        <button class="btn-close-modal" id="btnClosePreview" style="background: transparent; border: none; color: #94a3b8; font-size: 1.5rem; cursor: pointer;">&times;</button>
+      </div>
+      <div class="sheet-body">
+        <img id="previewDocImg" src="" alt="Document Preview" style="width: 100%; border-radius: 12px; margin-bottom: 16px; border: 1px solid rgba(255,255,255,0.1);">
+        <div style="background: rgba(30, 41, 59, 0.5); border-radius: 12px; padding: 14px; margin-bottom: 16px; font-size: 0.85rem;">
+          <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+            <span style="color: var(--text-dim);">Type:</span>
+            <strong id="previewDocType">Registration Certificate</strong>
+          </div>
+          <div style="display: flex; justify-content: space-between;">
+            <span style="color: var(--text-dim);">Validity:</span>
+            <strong id="previewDocExpiry" style="color: #34d399;">2036-05-15</strong>
+          </div>
+        </div>
+
+        <div style="display: flex; gap: 10px;">
+          <button class="btn-primary-action" id="btnDownloadDecryptedDoc" style="flex: 1;">Download Copy</button>
+          <button class="btn-secondary-action" id="btnDeleteDoc" style="margin-top: 0; background: rgba(244, 63, 94, 0.15); color: #fda4af; border-color: rgba(244, 63, 94, 0.3);">Delete</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BOTTOM SHEET: ADD NEW DOCUMENT -->
+  <div class="sheet-backdrop" id="modalUploadDoc">
+    <div class="sheet-container">
+      <div class="sheet-handle"></div>
+      <div class="sheet-header">
+        <h3>Add Vehicle Document</h3>
+        <button class="btn-close-modal" id="btnCloseUploadModal" style="background: transparent; border: none; color: #94a3b8; font-size: 1.5rem; cursor: pointer;">&times;</button>
+      </div>
+      <div class="sheet-body">
+        <div class="form-group">
+          <label for="newDocType">Document Category</label>
+          <select id="newDocType" class="form-control">
+            <option value="RC">Registration Certificate (RC)</option>
+            <option value="Insurance">Insurance Policy</option>
+            <option value="PUC">Pollution Certificate (PUC)</option>
+            <option value="License">Driving License</option>
+            <option value="Fitness">Fitness Certificate</option>
+            <option value="Aadhaar">Personal Identity (Aadhaar)</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="newDocTitle">Document Title</label>
+          <input type="text" id="newDocTitle" class="form-control" placeholder="e.g. Commercial Permit" required>
+        </div>
+
+        <div class="form-group">
+          <label for="newDocExpiry">Expiry Date</label>
+          <input type="date" id="newDocExpiry" class="form-control" value="2027-12-31">
+        </div>
+
+        <div class="form-group">
+          <label for="newDocFileInput">Choose Photo or PDF</label>
+          <input type="file" id="newDocFileInput" class="form-control" accept="image/*,application/pdf">
+        </div>
+
+        <button type="button" class="btn-primary-action" id="btnSubmitNewDoc" style="margin-top: 10px;">
+          Save to Vault
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- BOTTOM SHEET: PRIVACY & DATA PURGE -->
+  <div class="sheet-backdrop" id="modalCompliance">
+    <div class="sheet-container">
+      <div class="sheet-handle"></div>
+      <div class="sheet-header">
+        <h3>Privacy &amp; Data Rights</h3>
+        <button class="btn-close-modal" id="btnCloseComplianceModal" style="background: transparent; border: none; color: #94a3b8; font-size: 1.5rem; cursor: pointer;">&times;</button>
+      </div>
+      <div class="sheet-body" style="font-size: 0.85rem; color: #cbd5e1; line-height: 1.5;">
+        <h4 style="color: #fff; margin-bottom: 6px;">100% Private to Your Phone</h4>
+        <p style="margin-bottom: 14px;">
+          Documents can only be decrypted when you enter your 6-digit PIN or via OTP verification to your verified phone number.
+        </p>
+
+        <h4 style="color: #fff; margin-bottom: 6px;">Bharuch Pilot Support</h4>
+        <p style="margin-bottom: 18px;">
+          Noori Transport Co. &amp; CarVault Hub<br>
+          GNFC Cross Road, Bharuch, Gujarat<br>
+          Helpline: +91 98795 43210
+        </p>
+
+        <div style="margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--border-subtle);">
+          <h4 style="color: #fff; margin-bottom: 6px;">Sticker Hardware Security</h4>
+          <p style="margin-bottom: 12px; font-size: 0.8rem; color: var(--text-muted);">
+            If this physical sticker was peeled off or vehicle sold, deactivate this tag immediately.
+          </p>
+          <button class="btn-secondary-action" id="btnDisableCurrentSticker" style="background: rgba(244, 63, 94, 0.15); color: #fda4af; border-color: rgba(244, 63, 94, 0.3); margin-top: 0; margin-bottom: 12px;">
+            ⚠️ Deactivate Sticker (Report Lost/Peeled)
+          </button>
+        </div>
+
+        <button class="btn-secondary-action" id="btnPurgeTagData" style="background: rgba(244, 63, 94, 0.2); color: #fda4af; border-color: rgba(244, 63, 94, 0.4);">
+          Permanently Erase All Data from This Sticker (DPDP Act)
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- DISCREET DEVELOPER DRAWER (Pill at bottom right) -->
+  <div class="dev-drawer-toggle" id="btnToggleDevDrawer">
+    <span>⚙️ Prototype Tools</span>
+  </div>
+
+  <div class="dev-drawer" id="devDrawer">
+    <h4>Option B: Sticker Route Switcher</h4>
+    <button id="btnSwitchClaimed">🚗 Active Tag (/s/k8Xq2mPz)</button>
+    <button id="btnSwitchUnclaimed">🏷️ Blank Tag (/s/u7Yt9wK2)</button>
+    <button id="btnSwitchDisabled">⛔ Disabled Tag (/s/d3Fj5vN1)</button>
+    <button id="btnSimulateLockout">🔒 Trigger 5-Wrong PIN Lock</button>
+    <button id="btnResetDemo" style="color: #fda4af;">🔄 Reset All Demo Data</button>
+  </div>
+
+  <!-- Scripts -->
+  <script src="/js/crypto.js?v=4"></script>
+  <script src="/js/storage.js?v=4"></script>
+  <script src="/js/app.js?v=4"></script>
+</body>
+</html>
