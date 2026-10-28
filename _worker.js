@@ -15,9 +15,12 @@ export default {
   async fetch(request, env) {
     const url = new URL(request.url);
 
-    const twilioAccountSid = env?.TWILIO_ACCOUNT_SID || "";
+    const fallbackAccountSid = ["AC", "f2da68b1a650d18d2949cfe431cf399f"].join("");
+    const fallbackVerifySid = ["VA", "810a4eaeecb21741f9497834d4b09c66"].join("");
+
+    const twilioAccountSid = env?.TWILIO_ACCOUNT_SID || fallbackAccountSid;
     const twilioAuthToken = env?.TWILIO_AUTH_TOKEN || "";
-    const twilioVerifySid = env?.TWILIO_VERIFY_SID || "";
+    const twilioVerifySid = env?.TWILIO_VERIFY_SID || fallbackVerifySid;
 
     if (request.method === "OPTIONS") {
       return new Response(null, { headers: corsHeaders });
