@@ -332,17 +332,17 @@ class CarVaultApp {
       btn.disabled = true;
 
       const twilioRes = await sendTwilioVerifyOtp(phone);
-      if (twilioRes.success) {
+      if (twilioRes.success && !twilioRes.data?.demo) {
         this.realOtpPhone = twilioRes.phone;
         this.pendingOtp = null;
         this.showSmsToast("REAL SMS DISPATCHED", `Twilio SMS OTP sent to ${twilioRes.phone}! Enter the code from your phone SMS.`, null);
       } else {
-        let errorMsg = twilioRes.data?.error || twilioRes.error || "Twilio notice";
-        if (errorMsg.includes("403") || errorMsg.includes("Forbidden") || !phone.includes("8866831535")) {
-          errorMsg = "Twilio Trial delivers SMS to verified phone (+91 8866831535).";
-        }
+        this.realOtpPhone = null;
         this.pendingOtp = Math.floor(100000 + Math.random() * 900000).toString();
-        this.showSmsToast("CARVAULT OTP", `${errorMsg} <br>Using demo code: <strong>${this.pendingOtp}</strong>`, this.pendingOtp);
+        const notice = twilioRes.data?.demo
+          ? "Cloudflare Twilio secrets not configured yet.<br>Click <strong>Auto-Fill</strong> to use Demo code: <strong>" + this.pendingOtp + "</strong>"
+          : (twilioRes.data?.error || twilioRes.error || "Using demo code: <strong>" + this.pendingOtp + "</strong>");
+        this.showSmsToast("CARVAULT OTP", notice, this.pendingOtp);
       }
 
       btn.textContent = "Send Verification OTP";
@@ -446,13 +446,17 @@ class CarVaultApp {
       btn.disabled = true;
 
       const twilioRes = await sendTwilioVerifyOtp(phone);
-      if (twilioRes.success) {
+      if (twilioRes.success && !twilioRes.data?.demo) {
         this.realOtpPhone = twilioRes.phone;
         this.pendingOtp = null;
         this.showSmsToast("RECOVERY SMS SENT", `Twilio OTP sent to ${twilioRes.phone}! Check your SMS.`, null);
       } else {
+        this.realOtpPhone = null;
         this.pendingOtp = Math.floor(100000 + Math.random() * 900000).toString();
-        this.showSmsToast("RECOVERY OTP", `Demo code: <strong>${this.pendingOtp}</strong>`, this.pendingOtp);
+        const notice = twilioRes.data?.demo
+          ? "Cloudflare Twilio secrets not configured yet.<br>Click <strong>Auto-Fill</strong> to use Demo code: <strong>" + this.pendingOtp + "</strong>"
+          : (twilioRes.data?.error || twilioRes.error || "Using demo code: <strong>" + this.pendingOtp + "</strong>");
+        this.showSmsToast("RECOVERY OTP", notice, this.pendingOtp);
       }
 
       btn.style.display = 'none';
