@@ -39,12 +39,28 @@ export default {
           });
         }
 
+        const authHeader = "Basic " + btoa(`${twilioAccountSid}:${twilioAuthToken}`);
+
+        // Automatically update the Verify service FriendlyName to "CarVault Tag" so the SMS sent by Twilio displays "CarVault Tag"
+        try {
+          await fetch(`https://verify.twilio.com/v2/Services/${twilioVerifySid}`, {
+            method: "POST",
+            headers: {
+              "Authorization": authHeader,
+              "Content-Type": "application/x-www-form-urlencoded"
+            },
+            body: "FriendlyName=" + encodeURIComponent("CarVault Tag")
+          });
+        } catch (e) {
+          // Non-blocking fallback
+        }
+
         const twilioUrl = `https://verify.twilio.com/v2/Services/${twilioVerifySid}/Verifications`;
         const params = new URLSearchParams();
         params.append("To", phone);
         params.append("Channel", "sms");
+        params.append("CustomFriendlyName", "CarVault Tag");
 
-        const authHeader = "Basic " + btoa(`${twilioAccountSid}:${twilioAuthToken}`);
         const twilioRes = await fetch(twilioUrl, {
           method: "POST",
           headers: {
@@ -107,11 +123,16 @@ export default {
 
         const data = await twilioRes.json();
         const isApproved = data.status === "approved";
-        return new Response(JSON.stringify({ success: true, approved: isApproved, status: data.status }), {
+        return new Response(JSON.stringify({ 
+          success: true, 
+          approved: isApproved, 
+          status: data.status,
+          message: data.message || (isApproved ? "Approved" : "Incorrect or expired code")
+        }), {
           headers: { ...corsHeaders, "Content-Type": "application/json" }
         });
       } catch (err) {
-        return new Response(JSON.stringify({ success: true, approved: false, error: "Verification failed" }), {
+        return new Response(JSON.stringify({ success: false, approved: false, error: "Verification failed: " + err.message }), {
           headers: { ...corsHeaders, "Content-Type": "application/json" }
         });
       }
