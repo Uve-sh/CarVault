@@ -64,25 +64,10 @@ export default {
 
         const authHeader = "Basic " + btoa(`${twilioAccountSid}:${twilioAuthToken}`);
 
-        // Automatically update the Verify service FriendlyName to "CarVault Tag" so the SMS sent by Twilio displays "CarVault Tag"
-        try {
-          await fetch(`https://verify.twilio.com/v2/Services/${twilioVerifySid}`, {
-            method: "POST",
-            headers: {
-              "Authorization": authHeader,
-              "Content-Type": "application/x-www-form-urlencoded"
-            },
-            body: "FriendlyName=" + encodeURIComponent("CarVault Tag")
-          });
-        } catch (e) {
-          // Non-blocking fallback
-        }
-
         const twilioUrl = `https://verify.twilio.com/v2/Services/${twilioVerifySid}/Verifications`;
         const params = new URLSearchParams();
         params.append("To", phone);
         params.append("Channel", "sms");
-        params.append("CustomFriendlyName", "CarVault Tag");
 
         const twilioRes = await fetch(twilioUrl, {
           method: "POST",
