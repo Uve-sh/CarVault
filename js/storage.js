@@ -51,11 +51,11 @@ class VaultStorage {
         <text x="25" y="145" font-family="'Space Grotesk', monospace" font-size="15" font-weight="700" fill="#38bdf8">VEHICLE NO: GJ16-XX-2026</text>
         <text x="25" y="175" font-family="system-ui, sans-serif" font-size="13" fill="#cbd5e1">REGISTERED OWNER: NOORI TRANSPORT CO., BHARUCH</text>
         <text x="25" y="205" font-family="system-ui, sans-serif" font-size="13" fill="#cbd5e1">AUTHENTICATION: AES-256-GCM HARDWARE ENCRYPTED</text>
-        <text x="25" y="235" font-family="system-ui, sans-serif" font-size="13" fill="#10b981">✓ MV ACT 1988 &amp; RULE 139 VALID DIGITAL COPY</text>
+        <text x="25" y="235" font-family="system-ui, sans-serif" font-size="13" fill="#10b981">VALID DIGITAL COPY - MV ACT 1988</text>
         <text x="25" y="265" font-family="monospace" font-size="11" fill="#64748b">CARVAULT NFC TAG: #k8Xq2mPz | SHA-256: 9a7f4c28...b781</text>
       </g>
     </svg>`;
-    return 'data:image/svg+xml;base64,' + window.btoa(svg);
+    return 'data:image/svg+xml;utf8,' + encodeURIComponent(svg);
   }
 
   getDefaultActiveSticker() {
