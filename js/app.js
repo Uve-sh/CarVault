@@ -337,17 +337,13 @@ class CarVaultApp {
         this.pendingOtp = null;
         this.showSmsToast(
           "CARVAULT • SECURITY OTP",
-          `Here is your OTP for CarVault tag. Sent via SMS to <strong>${twilioRes.phone}</strong>. Do not share this with anyone. It will expire in 2 mins.`,
+          `OTP sent via SMS to <strong>${twilioRes.phone}</strong>. Check your phone SMS. It will expire in 2 mins.`,
           null
         );
       } else {
-        this.realOtpPhone = null;
-        this.pendingOtp = Math.floor(100000 + Math.random() * 900000).toString();
-        this.showSmsToast(
-          "CARVAULT • SECURITY OTP",
-          `Here is your OTP for CarVault tag: <strong>${this.pendingOtp}</strong>. Do not share this with anyone. It will expire in 2 mins.`,
-          this.pendingOtp
-        );
+        const errorMsg = twilioRes.error || twilioRes.data?.error || "Could not dispatch SMS to your phone";
+        alert("SMS Delivery Error: " + errorMsg + "\nPlease ensure your phone is verified in Twilio or check settings.");
+        this.realOtpPhone = twilioRes.phone || phone;
       }
 
       btn.textContent = "Send Verification OTP";
@@ -370,17 +366,12 @@ class CarVaultApp {
           this.pendingOtp = null;
           this.showSmsToast(
             "CARVAULT • SECURITY OTP",
-            `Here is your OTP for CarVault tag. Resent via SMS to <strong>${twilioRes.phone}</strong>. Do not share this with anyone. It will expire in 2 mins.`,
+            `A new OTP was resent via SMS to <strong>${twilioRes.phone}</strong>. Check your phone SMS. It will expire in 2 mins.`,
             null
           );
         } else {
-          this.realOtpPhone = null;
-          this.pendingOtp = Math.floor(100000 + Math.random() * 900000).toString();
-          this.showSmsToast(
-            "CARVAULT • SECURITY OTP",
-            `Here is your OTP for CarVault tag: <strong>${this.pendingOtp}</strong>. Do not share this with anyone. It will expire in 2 mins.`,
-            this.pendingOtp
-          );
+          const errorMsg = twilioRes.error || twilioRes.data?.error || "Could not resend SMS to your phone";
+          alert("SMS Resend Error: " + errorMsg);
         }
 
         btnResendClaim.textContent = "Resent!";
@@ -501,17 +492,13 @@ class CarVaultApp {
         this.pendingOtp = null;
         this.showSmsToast(
           "CARVAULT • SECURITY OTP",
-          `Here is your OTP for CarVault tag. Sent via SMS to <strong>${twilioRes.phone}</strong>. Do not share this with anyone. It will expire in 2 mins.`,
+          `OTP sent via SMS to <strong>${twilioRes.phone}</strong>. Check your phone SMS. It will expire in 2 mins.`,
           null
         );
       } else {
-        this.realOtpPhone = null;
-        this.pendingOtp = Math.floor(100000 + Math.random() * 900000).toString();
-        this.showSmsToast(
-          "CARVAULT • SECURITY OTP",
-          `Here is your OTP for CarVault tag: <strong>${this.pendingOtp}</strong>. Do not share this with anyone. It will expire in 2 mins.`,
-          this.pendingOtp
-        );
+        const errorMsg = twilioRes.error || twilioRes.data?.error || "Could not dispatch SMS to your phone";
+        alert("SMS Delivery Error: " + errorMsg + "\nPlease ensure your phone is verified in Twilio or check settings.");
+        this.realOtpPhone = twilioRes.phone || phone;
       }
 
       btn.style.display = 'none';
@@ -534,17 +521,12 @@ class CarVaultApp {
           this.pendingOtp = null;
           this.showSmsToast(
             "CARVAULT • SECURITY OTP",
-            `Here is your OTP for CarVault tag. Resent via SMS to <strong>${twilioRes.phone}</strong>. Do not share this with anyone. It will expire in 2 mins.`,
+            `A new OTP was resent via SMS to <strong>${twilioRes.phone}</strong>. Check your phone SMS. It will expire in 2 mins.`,
             null
           );
         } else {
-          this.realOtpPhone = null;
-          this.pendingOtp = Math.floor(100000 + Math.random() * 900000).toString();
-          this.showSmsToast(
-            "CARVAULT • SECURITY OTP",
-            `Here is your OTP for CarVault tag: <strong>${this.pendingOtp}</strong>. Do not share this with anyone. It will expire in 2 mins.`,
-            this.pendingOtp
-          );
+          const errorMsg = twilioRes.error || twilioRes.data?.error || "Could not resend SMS to your phone";
+          alert("SMS Resend Error: " + errorMsg);
         }
 
         btnResendRecovery.textContent = "Resent!";

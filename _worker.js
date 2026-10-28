@@ -23,6 +23,19 @@ export default {
       return new Response(null, { headers: corsHeaders });
     }
 
+    // Config Diagnostic endpoint
+    if (url.pathname === "/api/check-config") {
+      return new Response(JSON.stringify({
+        hasAccountSid: Boolean(twilioAccountSid),
+        hasAuthToken: Boolean(twilioAuthToken),
+        hasVerifySid: Boolean(twilioVerifySid),
+        accountSidPrefix: twilioAccountSid ? twilioAccountSid.substring(0, 6) + "..." : null,
+        verifySidPrefix: twilioVerifySid ? twilioVerifySid.substring(0, 6) + "..." : null
+      }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" }
+      });
+    }
+
     // 1. Send OTP via Twilio Verify
     if (url.pathname === "/api/send-otp" && request.method === "POST") {
       try {
@@ -33,8 +46,15 @@ export default {
         }
 
         if (!twilioAccountSid || !twilioAuthToken || !twilioVerifySid) {
-          // Demo fallback response if credentials are not set in environment
-          return new Response(JSON.stringify({ success: true, status: "pending", demo: true, phone }), {
+          const missing = [];
+          if (!twilioAccountSid) missing.push("TWILIO_ACCOUNT_SID");
+          if (!twilioAuthToken) missing.push("TWILIO_AUTH_TOKEN");
+          if (!twilioVerifySid) missing.push("TWILIO_VERIFY_SID");
+          return new Response(JSON.stringify({ 
+            success: false, 
+            error: `Twilio credentials missing on Cloudflare: ${missing.join(', ')}. Please check Cloudflare Worker settings.` 
+          }), {
+            status: 400,
             headers: { ...corsHeaders, "Content-Type": "application/json" }
           });
         }
