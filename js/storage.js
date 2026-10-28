@@ -58,19 +58,17 @@ class VaultStorage {
     return 'data:image/svg+xml;base64,' + window.btoa(svg);
   }
 
-  async initDefaultTags() {
-    let existing = this.getAllStickers();
-    if (!existing || Object.keys(existing).length === 0) {
-      existing = {};
-
-      // Tag A: Claimed Active Vehicle (Noori Transport, Bharuch)
-      // Option B unique sticker code: 'k8Xq2mPz'
-      const defaultPin = "123456";
-      const keyBundle = await window.VaultCrypto.setupVaultKeys(defaultPin);
-      const dek = await window.VaultCrypto.unlockDataKeyWithPin(defaultPin, keyBundle);
-
-      // Encrypt sample documents
-      const sampleDocs = [
+  getDefaultActiveSticker() {
+    return {
+      code: 'k8Xq2mPz',
+      status: 'active',
+      claimCode: 'CV-8924-X',
+      vehicleId: 'veh-gj16-2026',
+      vehicleName: 'Mahindra Bolero Maxi Truck',
+      vehicleNumber: 'GJ16-XX-2026',
+      ownerName: 'Iqbal Patel (Noori Transport)',
+      phone: '8866831535',
+      documents: [
         {
           id: 'doc-rc',
           type: 'RC',
@@ -79,7 +77,7 @@ class VaultStorage {
           validTill: '2036-05-15',
           status: 'Valid',
           mimeType: 'image/svg+xml',
-          sampleName: 'RC_GJ16XX2026.svg',
+          fileName: 'RC_GJ16XX2026.svg',
           rawUrl: this.createSampleDocumentImage('REGISTRATION CERTIFICATE', 'Transport Dept, Govt of Gujarat (GJ16 Bharuch)', '#2563eb')
         },
         {
@@ -90,7 +88,7 @@ class VaultStorage {
           validTill: '2027-03-31',
           status: 'Active',
           mimeType: 'image/svg+xml',
-          sampleName: 'Policy_NewIndia_2026.svg',
+          fileName: 'Policy_NewIndia_2026.svg',
           rawUrl: this.createSampleDocumentImage('MOTOR COMPREHENSIVE INSURANCE', 'New India Assurance Co. Ltd - Bharuch Branch', '#059669')
         },
         {
@@ -101,7 +99,7 @@ class VaultStorage {
           validTill: '2027-01-10',
           status: 'Valid',
           mimeType: 'image/svg+xml',
-          sampleName: 'PUC_Valid_Jan2027.svg',
+          fileName: 'PUC_Valid_Jan2027.svg',
           rawUrl: this.createSampleDocumentImage('POLLUTION UNDER CONTROL (PUC)', 'Approved Emission Testing Center - GNFC Cross Road', '#10b981')
         },
         {
@@ -112,7 +110,7 @@ class VaultStorage {
           validTill: '2030-08-20',
           status: 'Valid',
           mimeType: 'image/svg+xml',
-          sampleName: 'DL_Transport_Gujarat.svg',
+          fileName: 'DL_Transport_Gujarat.svg',
           rawUrl: this.createSampleDocumentImage('DRIVING LICENSE (COMMERCIAL / HMV)', 'Licensing Authority: RTO Bharuch', '#d97706')
         },
         {
@@ -123,77 +121,72 @@ class VaultStorage {
           validTill: 'Permanent',
           status: 'Encrypted Private',
           mimeType: 'image/svg+xml',
-          sampleName: 'Aadhaar_Owner_Vault.svg',
+          fileName: 'Aadhaar_Owner_Vault.svg',
           rawUrl: this.createSampleDocumentImage('AADHAAR IDENTIFICATION (PRIVATE)', 'UIDAI Verified Personal Identity Document', '#4f46e5')
         }
-      ];
+      ],
+      lockout: {
+        failedAttempts: 0,
+        fails24h: 0,
+        lockedUntil: 0,
+        alertSent24h: false
+      },
+      activatedAt: new Date().toISOString()
+    };
+  }
 
-      const encryptedDocs = [];
-      for (const doc of sampleDocs) {
-        const textBuffer = new TextEncoder().encode(doc.rawUrl);
-        const encrypted = await window.VaultCrypto.encryptFile(dek, textBuffer);
-        encryptedDocs.push({
-          id: doc.id,
-          type: doc.type,
-          title: doc.title,
-          vehicleNo: doc.vehicleNo,
-          validTill: doc.validTill,
-          status: doc.status,
-          mimeType: doc.mimeType,
-          fileName: doc.sampleName,
-          encryptedPayload: encrypted,
-          uploadedAt: new Date().toISOString()
-        });
+  async initDefaultTags() {
+    try {
+      let existing = this.getAllStickers();
+      if (!existing || Object.keys(existing).length === 0) {
+        existing = {};
+        const defaultActive = this.getDefaultActiveSticker();
+        existing['k8Xq2mPz'] = defaultActive;
+        existing['tag-bharuch-car-01'] = defaultActive;
+        existing['u7Yt9wK2'] = {
+          code: 'u7Yt9wK2',
+          status: 'unclaimed',
+          claimCode: 'CV-8924-X',
+          createdDate: new Date().toISOString()
+        };
+        existing['tag-unclaimed-new-99'] = existing['u7Yt9wK2'];
+        existing['d3Fj5vN1'] = {
+          code: 'd3Fj5vN1',
+          status: 'disabled',
+          claimCode: 'CV-7733-Z',
+          disableReason: 'Tag deactivated by owner / maximum lockout limit reached',
+          phone: '8866831535',
+          vehicleNumber: 'GJ16-XX-2026'
+        };
+        localStorage.setItem(STORAGE_KEYS.VAULT_STICKERS, JSON.stringify(existing));
+
+        // Derive real cryptographic keys asynchronously
+        if (window.VaultCrypto && window.crypto && window.crypto.subtle) {
+          try {
+            const defaultPin = "123456";
+            const keyBundle = await window.VaultCrypto.setupVaultKeys(defaultPin);
+            const dek = await window.VaultCrypto.unlockDataKeyWithPin(defaultPin, keyBundle);
+            const encryptedDocs = [];
+            for (const doc of defaultActive.documents) {
+              const textBuffer = new TextEncoder().encode(doc.rawUrl);
+              const encrypted = await window.VaultCrypto.encryptFile(dek, textBuffer);
+              encryptedDocs.push({ ...doc, encryptedPayload: encrypted });
+            }
+            existing['k8Xq2mPz'].keyBundle = keyBundle;
+            existing['k8Xq2mPz'].documents = encryptedDocs;
+            existing['tag-bharuch-car-01'] = existing['k8Xq2mPz'];
+            localStorage.setItem(STORAGE_KEYS.VAULT_STICKERS, JSON.stringify(existing));
+          } catch (cryptoErr) {
+            console.warn("Crypto key derivation notice:", cryptoErr);
+          }
+        }
       }
 
-      // 1. Primary Active Sticker (Option B)
-      existing['k8Xq2mPz'] = {
-        code: 'k8Xq2mPz',
-        status: 'active', // 'unclaimed' | 'active' | 'disabled'
-        claimCode: 'CV-8924-X',
-        vehicleId: 'veh-gj16-2026',
-        vehicleName: 'Mahindra Bolero Maxi Truck',
-        vehicleNumber: 'GJ16-XX-2026',
-        ownerName: 'Iqbal Patel (Noori Transport)',
-        phone: '8866831535',
-        keyBundle: keyBundle,
-        documents: encryptedDocs,
-        lockout: {
-          failedAttempts: 0,
-          fails24h: 0,
-          lockedUntil: 0,
-          alertSent24h: false
-        },
-        activatedAt: new Date().toISOString()
-      };
-
-      // Also map legacy tag id for backwards compatibility
-      existing['tag-bharuch-car-01'] = existing['k8Xq2mPz'];
-
-      // 2. Fresh Unclaimed Sticker out of package (Option B)
-      existing['u7Yt9wK2'] = {
-        code: 'u7Yt9wK2',
-        status: 'unclaimed',
-        claimCode: 'CV-8924-X', // Printed under packaging scratch foil
-        createdDate: new Date().toISOString()
-      };
-      existing['tag-unclaimed-new-99'] = existing['u7Yt9wK2'];
-
-      // 3. Disabled Sticker Demo (e.g. reported lost or 20+ attacks)
-      existing['d3Fj5vN1'] = {
-        code: 'd3Fj5vN1',
-        status: 'disabled',
-        claimCode: 'CV-7733-Z',
-        disableReason: 'Tag deactivated by owner / maximum lockout limit reached',
-        phone: '8866831535',
-        vehicleNumber: 'GJ16-XX-2026'
-      };
-
-      localStorage.setItem(STORAGE_KEYS.VAULT_STICKERS, JSON.stringify(existing));
-    }
-
-    if (!localStorage.getItem(STORAGE_KEYS.ACTIVE_STICKER_CODE)) {
-      localStorage.setItem(STORAGE_KEYS.ACTIVE_STICKER_CODE, 'k8Xq2mPz');
+      if (!localStorage.getItem(STORAGE_KEYS.ACTIVE_STICKER_CODE)) {
+        localStorage.setItem(STORAGE_KEYS.ACTIVE_STICKER_CODE, 'k8Xq2mPz');
+      }
+    } catch (e) {
+      console.warn("initDefaultTags storage notice:", e);
     }
   }
 
@@ -209,6 +202,12 @@ class VaultStorage {
     if (!code) return null;
     const stickers = this.getAllStickers();
     if (stickers[code]) return stickers[code];
+
+    if (code === 'k8Xq2mPz' || code === 'tag-bharuch-car-01') {
+      const defaultActive = this.getDefaultActiveSticker();
+      this.saveSticker(defaultActive);
+      return defaultActive;
+    }
 
     // Auto-create blank unclaimed sticker for new codes (e.g. freshly scanned tag)
     const newSticker = {
